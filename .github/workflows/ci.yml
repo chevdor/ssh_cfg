@@ -1,3 +1,5 @@
+name: CI
+
 on:
   push:
     branches:
@@ -6,102 +8,49 @@ on:
     branches:
       - '**'
 
-name: CI
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  audit:
-    name: Audit
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-      - # FIXME: Switch back when actions-rs/toolchain#{209,220,222} is merged
-        uses: r3-os/actions-rust-toolchain@a862b6623c178b43a3135516442a5f72fb5c1877
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: bp3d-actions/audit-check@9c23bd47e5e7b15b824739e0862cb878a52cc211
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-      - # FIXME: Switch back when actions-rs/toolchain#{209,220,222} is merged
-        uses: r3-os/actions-rust-toolchain@a862b6623c178b43a3135516442a5f72fb5c1877
+      - uses: actions/checkout@v4
+      # rustfmt.toml uses unstable options, so formatting is checked on nightly.
+      - uses: dtolnay/rust-toolchain@nightly
         with:
-          profile: minimal
-          toolchain: nightly
-          override: true
           components: rustfmt
-
-      - # FIXME: Switch back when actions-rs/cargo#217 gets merged
-        uses: r3-os/actions-rust-cargo@fb222fe18dc90e381546d012f9e3d6f353f0f627
-        with:
-          command: fmt
-          args: --all -- --check
+      - run: cargo fmt --all -- --check
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-      - # FIXME: Switch back when actions-rs/toolchain#{209,220,222} is merged
-        uses: r3-os/actions-rust-toolchain@a862b6623c178b43a3135516442a5f72fb5c1877
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: nightly
-          override: true
           components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --all-targets -- -D warnings
 
-      - # FIXME: Switch back when actions-rs/cargo#217 gets merged
-        uses: r3-os/actions-rust-cargo@fb222fe18dc90e381546d012f9e3d6f353f0f627
-        with:
-          command: clippy
-          args: -- -D warnings
-
-  build_and_test_linux:
-    name: Build and Test (Linux)
-    runs-on: ubuntu-latest
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v3
-      - # FIXME: Switch back when actions-rs/toolchain#{209,220,222} is merged
-        uses: r3-os/actions-rust-toolchain@a862b6623c178b43a3135516442a5f72fb5c1877
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - # FIXME: Switch back when actions-rs/cargo#217 gets merged
-        uses: r3-os/actions-rust-cargo@fb222fe18dc90e381546d012f9e3d6f353f0f627
-        with:
-          command: test
-          args: --release --lib --tests
-
-  build_and_test_windows:
-    name: Build and Test (Windows)
-    runs-on: windows-latest
-    timeout-minutes: 10
-    steps:
-      - name: Prepare symlink configuration
+      - name: Prepare symlink configuration (Windows)
+        if: runner.os == 'Windows'
         run: git config --global core.symlinks true
-
-      - uses: actions/checkout@v3
-      - # FIXME: Switch back when actions-rs/toolchain#{209,220,222} is merged
-        uses: r3-os/actions-rust-toolchain@a862b6623c178b43a3135516442a5f72fb5c1877
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - # FIXME: Switch back when actions-rs/cargo#217 gets merged
-        uses: r3-os/actions-rust-cargo@fb222fe18dc90e381546d012f9e3d6f353f0f627
-        with:
-          command: test
-          args: --release --lib --tests
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Doctests are skipped: the lib.rs example parses the runner's real
+      # ~/.ssh/config, which is absent (or has unknown keys) in CI.
+      - run: cargo test --lib --tests
