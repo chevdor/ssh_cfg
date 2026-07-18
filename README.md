@@ -1,8 +1,8 @@
 # 🌐 SSH Cfg
 
-[![Crates.io](https://img.shields.io/crates/v/ssh_cfg.svg)](https://crates.io/crates/ssh_cfg)
-[![docs.rs](https://img.shields.io/docsrs/ssh_cfg)](https://docs.rs/ssh_cfg)
-[![CI](https://github.com/chevdor/ssh_cfg/actions/workflows/ci.yml/badge.svg)](https://github.com/chevdor/ssh_cfg/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/ssh_cnfg.svg)](https://crates.io/crates/ssh_cnfg)
+[![docs.rs](https://img.shields.io/docsrs/ssh_cnfg)](https://docs.rs/ssh_cnfg)
+[![CI](https://github.com/chevdor/ssh_cnfg/actions/workflows/ci.yml/badge.svg)](https://github.com/chevdor/ssh_cnfg/actions/workflows/ci.yml)
 
 Parses `~/.ssh/config` asynchronously.
 

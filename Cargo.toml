@@ -8,7 +8,7 @@ authors = [
 ]
 edition = "2018"
 description = "Parses `~/.ssh/config` asynchronously."
-repository = "https://github.com/chevdor/ssh_cfg"
+repository = "https://github.com/chevdor/ssh_cnfg"
 documentation = "https://docs.rs/ssh_cnfg/"
 readme = "README.md"
 keywords = ["ssh", "async"]
