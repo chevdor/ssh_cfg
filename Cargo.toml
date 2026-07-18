@@ -1,12 +1,12 @@
 [package]
 name = "ssh_cnfg"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
     "Azriel Hoh <azriel91@gmail.com>",
     "Julien-R44 <https://crates.io/users/Julien-R44>",
     "Chevdor <chevdor@gmail.com>",
 ]
-edition = "2018"
+edition = "2021"
 description = "Parses `~/.ssh/config` asynchronously."
 repository = "https://github.com/chevdor/ssh_cnfg"
 documentation = "https://docs.rs/ssh_cnfg/"
@@ -21,10 +21,10 @@ license = "MIT OR Apache-2.0"
 name = "ssh_cfg"
 
 [dependencies]
-async-fs = "1.5.0"
-dirs = "4.0.0"
-indexmap = "1.7.0"
-plain_path = "0.1.0"
+async-fs = "2"
+dirs = "6"
+indexmap = "2"
+plain_path = "0.1"
 
 [dev-dependencies]
-tokio = { version = "1.14.0", features = ["rt"] }
+tokio = { version = "1", features = ["rt"] }
